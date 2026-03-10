@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { runRewriteEsmSpecifiers } from './rewriteEsmSpecifiers';
 
 function run(cmd: string, args: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -33,6 +34,7 @@ function canUseDeclarationMap(tsconfigPath: string): boolean {
 
 export async function runBuildTs(args: string[]) {
   const isDev = args.includes('--dev');
+  const shouldRewriteEsmSpecifiers = args.includes('--rewrite-esm-specifiers');
 
   const tscArgs = isDev ? ['--declarationMap'] : [];
   const canUseEsmDeclarationMap = isDev && canUseDeclarationMap('tsconfig.esm.json');
@@ -43,4 +45,9 @@ export async function runBuildTs(args: string[]) {
 
   console.log(`[makage] tsc (ESM)${isDev ? ' [dev mode]' : ''}`);
   await run('tsc', esmArgs);
+
+  if (shouldRewriteEsmSpecifiers) {
+    console.log('[makage] rewriting ESM specifiers');
+    await runRewriteEsmSpecifiers(['--project', 'tsconfig.esm.json']);
+  }
 }

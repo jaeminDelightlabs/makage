@@ -118,6 +118,7 @@ These conventions allow for clean package distribution while maintaining a modul
 - **README + Footer concatenation** - Combine README with footer content before publishing
 - **Assets helper** - One-command copying of LICENSE, README, and package.json
 - **Build TypeScript helper** - Run both CJS and ESM TypeScript builds
+- **ESM specifier rewrite** - Optionally rewrite extensionless relative imports to Node-compatible `.js` specifiers
 - **Update workspace dependencies** - Automatically convert internal package references to `workspace:*`
 - **Zero dependencies** - Uses only Node.js built-in modules
 
@@ -142,6 +143,10 @@ makage build-ts
 # Build TypeScript with source maps for development
 makage build-ts --dev
 
+# Build with Node-compatible ESM specifier rewrite
+makage build --rewrite-esm-specifiers
+makage build-ts --rewrite-esm-specifiers
+
 # Copy files to destination
 makage copy ../../LICENSE README.md package.json dist --flat
 
@@ -164,15 +169,17 @@ makage update-workspace
 
 ## Commands
 
-### `makage build [--dev]`
+### `makage build [--dev] [--rewrite-esm-specifiers]`
 
 Complete build workflow that runs clean, build-ts, and assets in sequence.
 
 - Use `--dev` to enable source maps via `--declarationMap` flag
+- Use `--rewrite-esm-specifiers` to rewrite extensionless relative imports in ESM output to `.js` (e.g., `./foo` → `./foo.js`)
 
 ```bash
-makage build       # production build
-makage build --dev # development build with source maps
+makage build                    # production build
+makage build --dev              # development build with source maps
+makage build --rewrite-esm-specifiers  # build with Node-compatible ESM imports
 ```
 
 ### `makage clean [path...]`
@@ -219,17 +226,20 @@ Combines common asset copying tasks:
 makage assets
 ```
 
-### `makage build-ts [--dev]`
+### `makage build-ts [--dev] [--rewrite-esm-specifiers]`
 
 Runs TypeScript compilation for both CommonJS and ESM:
 1. `tsc` (CommonJS)
 2. `tsc -p tsconfig.esm.json` (ESM)
+3. *(optional)* Rewrite extensionless relative specifiers in ESM output
 
 - Use `--dev` to add `--declarationMap` for better debugging experience
+- Use `--rewrite-esm-specifiers` to rewrite relative imports in ESM `.js` files so they include file extensions, making them compatible with Node.js native ESM resolution
 
 ```bash
-makage build-ts       # production build
-makage build-ts --dev # development build with source maps
+makage build-ts                        # production build
+makage build-ts --dev                  # development build with source maps
+makage build-ts --rewrite-esm-specifiers   # rewrite ESM specifiers after build
 ```
 
 ### `makage update-workspace`

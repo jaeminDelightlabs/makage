@@ -50,12 +50,12 @@ function printHelp() {
 makage – tiny build helper
 
 Usage:
-  makage build [--dev]            (clean + build-ts + assets)
-  makage clean [path...]          (defaults to "dist")
+  makage build [--dev] [--rewrite-esm-specifiers]    (clean + build-ts + assets)
+  makage clean [path...]                             (defaults to "dist")
   makage copy [...sources] <dest> [--flat] [--footer]
   makage readme-footer --source <file> --footer <file> --dest <file>
   makage assets
-  makage build-ts [--dev]
+  makage build-ts [--dev] [--rewrite-esm-specifiers]
   makage update-workspace
 `);
 }
